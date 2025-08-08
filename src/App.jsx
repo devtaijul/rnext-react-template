@@ -1,13 +1,24 @@
+import { Route, Routes } from "react-router-dom";
+import PrivateRoutes from "./routes/PrivateRoutes";
+import { Home } from "./screen/Home";
+import { Login } from "./screen/Login";
+import { Profile } from "./screen/Profile";
+import { Register } from "./screen/Register";
+import NotFoundPage from "./screen/NotFoundPage";
+
 function App() {
   return (
-    <div className="text-4xl text-center font-bold text-red-800">
-      <h1 className="text-4xl text-center font-bold text-red-800">
-        Hello Vite + React!
-      </h1>
-      <div className="text-2xl text-center font-bold text-blue-800">
-        <p>Use this template as startup of rnext assigmentg</p>
-      </div>
-    </div>
+    <>
+      <Routes>
+        <Route element={<PrivateRoutes />}>
+          <Route element={<Home />} path="/" exact />
+          <Route element={<Profile />} path="/me" />
+        </Route>
+        <Route element={<Login />} path="/login" />
+        <Route element={<Register />} path="/register" />
+        <Route element={<NotFoundPage />} path="*" />
+      </Routes>
+    </>
   );
 }
 
