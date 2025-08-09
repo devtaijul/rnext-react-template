@@ -1,9 +1,8 @@
 import React from "react";
-import { Layout } from "../components/Layout";
 
 export const Notification = () => {
   return (
-    <Layout>
+    <main>
       <div className="notifications-container">
         {/* Header */}
         <header className="sticky top-0 bg-white  z-10">
@@ -206,6 +205,6 @@ export const Notification = () => {
           <div className="h-20" />
         </div>
       </div>
-    </Layout>
+    </main>
   );
 };

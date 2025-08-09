@@ -1,12 +1,11 @@
 import React from "react";
-import { Layout } from "../components/Layout";
-import post1 from "../assets/articles/post-1.jpg";
 import avatar from "../assets/articles/author-1.svg";
+import post1 from "../assets/articles/post-1.jpg";
 import { MorePost } from "./MorePost";
 
 export const PostDetails = () => {
   return (
-    <Layout>
+    <main>
       <div className="max-w-6xl w-full py-10 ml-[var(--sidebar-width)] px-4">
         {/* Post Details Section */}
         <div className="bg-white border rounded-sm overflow-hidden mb-8 mx-auto max-w-5xl">
@@ -236,6 +235,6 @@ export const PostDetails = () => {
         {/* More Posts Section */}
         <MorePost />
       </div>
-    </Layout>
+    </main>
   );
 };

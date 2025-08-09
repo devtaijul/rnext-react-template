@@ -1,10 +1,8 @@
 import React from "react";
-import { Sidebar } from "../components/Sidebar";
-import { Layout } from "../components/Layout";
 
 export const CreatePost = () => {
   return (
-    <Layout>
+    <main>
       {/* Header */}
       <header className="h-14 border-b flex items-center justify-between px-4">
         <button className="p-1">
@@ -165,6 +163,6 @@ export const CreatePost = () => {
           </div>
         </div>
       </div>
-    </Layout>
+    </main>
   );
 };

@@ -8,7 +8,6 @@ const BASE_URL =
 // axios base instance
 const api = axios.create({
   baseURL: BASE_URL,
-  withCredentials: true, // দরকার হলে; না লাগলে রাখতে পারো
 });
 
 const initialAuth = {
@@ -24,6 +23,12 @@ const AuthProvider = ({ children }) => {
 
   // --- helper: session setter ---
   const setSession = ({ accessToken, refreshToken, user }) => {
+    // set axios default immediately
+    if (accessToken) {
+      api.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
     setAuth((prev) => ({
       ...prev,
       accessToken: accessToken || "",
@@ -143,7 +148,7 @@ const AuthProvider = ({ children }) => {
           isRefreshing = true;
           const rt = localStorage.getItem("refreshToken");
           try {
-            const r = await axios.post(`${BASE_URL}/auth/refresh-token`, {
+            const r = await axios.post(`${BASE_URL}/api/auth/refresh-token`, {
               refreshToken: rt,
             });
             const { accessToken, refreshToken, user } = r.data || {};
@@ -171,13 +176,22 @@ const AuthProvider = ({ children }) => {
     };
   }, [auth.accessToken]); // rebind when token changes
 
+  // --- /users/me fetcher
+  const fetchMe = async () => {
+    if (!auth?.accessToken) return null; // token না থাকলে কিছু করো না
+    const { data } = await api.get("/api/users/me"); // <-- Bearer auto from intercept
+    setAuth((p) => ({ ...p, user: data }));
+    return data;
+  };
+
   const value = useMemo(
     () => ({
       auth,
-      setAuth, // if you need it
+      setAuth,
       setSession,
       loginWithRefreshToken,
       logout,
+      fetchMe,
       api, // export axios instance with interceptors
     }),
     [auth]
