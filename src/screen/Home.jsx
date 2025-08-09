@@ -1,7 +1,8 @@
-// Home.jsx
-import { useRef, useEffect } from "react";
-import { useFetchPosts } from "../hooks/useFetchPosts";
+// src/screen/Home.jsx
+import { useRef, useEffect, useState } from "react";
 import { Post } from "../components/Post";
+import { useFetchPosts } from "../hooks/useFetchPosts";
+import { useInfiniteObserver } from "../hooks/useInfiniteObserver";
 
 export const Home = () => {
   const {
@@ -14,22 +15,14 @@ export const Home = () => {
     isGuest,
   } = useFetchPosts({ limit: 10, guestLimit: 4, auto: true });
 
-  console.log("posts", posts);
-
-  // infinite scroll (auth থাকলেই)
-  const sentinelRef = useRef(null);
+  const [authPopup, setAuthPopup] = useState(false);
   useEffect(() => {
-    if (isGuest || !hasMore) return;
-    const el = sentinelRef.current;
-    if (!el) return;
+    if (isGuest && reachedGuestLimit) setAuthPopup(true);
+  }, [isGuest, reachedGuestLimit]);
 
-    const io = new IntersectionObserver(
-      (entries) => entries[0].isIntersecting && loadMore(),
-      { rootMargin: "600px 0px" }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [hasMore, isGuest, loadMore]);
+  // 🔁 Infinite scroll (Auth only)
+  const sentinelRef = useRef(null);
+  useInfiniteObserver(sentinelRef, !isGuest && hasMore, loadMore, "800px 0px");
 
   return (
     <div className="max-w-6xl mx-auto w-full py-10">
@@ -41,10 +34,11 @@ export const Home = () => {
 
       <div className="space-y-6">
         {posts.map((p) => (
-          <Post key={p._id} post={p} />
+          <Post key={p._id} post={p} onRequireAuth={() => setAuthPopup(true)} />
         ))}
 
-        {loading && (
+        {/* প্রথম লোডের skeleton */}
+        {loading && posts.length === 0 && (
           <div className="space-y-6">
             {[...Array(2)].map((_, i) => (
               <div key={i} className="bg-white rounded-lg overflow-hidden">
@@ -58,8 +52,10 @@ export const Home = () => {
           </div>
         )}
 
-        {!isGuest && hasMore && <div ref={sentinelRef} className="h-8" />}
+        {/* 👇 শুধুই Infinite Scroll sentinel (Auth only) */}
+        {!isGuest && hasMore && <div ref={sentinelRef} className="h-10" />}
 
+        {/* Guest preview note */}
         {isGuest && reachedGuestLimit && (
           <div className="mt-4 rounded bg-white text-black px-4 py-3 text-sm">
             You’re viewing a preview. <span className="font-medium">Login</span>{" "}
@@ -67,6 +63,9 @@ export const Home = () => {
           </div>
         )}
       </div>
+
+      {/* TODO: এখানে তোমার Login/Register popup দেখাও */}
+      {/* <GuestAuthPopup open={authPopup} onClose={() => setAuthPopup(false)} /> */}
     </div>
   );
 };

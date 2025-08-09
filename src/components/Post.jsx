@@ -6,6 +6,8 @@ import { PostLikes } from "./PostLikes";
 import { PostCaption } from "./PostCaption";
 import { PostCommentsPreview } from "./PostCommentsPreview";
 import { AddComment } from "./AddComment";
+import image_placeholder from "../assets/user_placeholder.jpg";
+import { PAGES } from "../config/pages.config";
 
 export const Post = ({ post, onRequireAuth }) => {
   if (!post) return null;
@@ -15,13 +17,16 @@ export const Post = ({ post, onRequireAuth }) => {
       {/* Header */}
       <div className="flex items-center p-3">
         <Link
-          to={`/profile/${post?.user?.username || post?.user?._id || ""}`}
+          to={PAGES.PROFILE_VIEW(post?.user?.username || post?.user?._id || "")}
           className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center"
         >
           <img
             src={
-              `${import.meta.env.VITE_SERVER_BASE_URL}/${post?.user?.avatar}` ||
-              "/assets/users/user-3.png"
+              (post?.user?.avatar &&
+                `${import.meta.env.VITE_SERVER_BASE_URL}/${
+                  post?.user?.avatar
+                }`) ||
+              image_placeholder
             }
             alt={post?.user?.name || "User"}
             className="w-full h-full object-cover"
@@ -29,7 +34,9 @@ export const Post = ({ post, onRequireAuth }) => {
         </Link>
         <div className="ml-2">
           <Link
-            to={`/profile/${post?.user?.username || post?.user?._id || ""}`}
+            to={PAGES.PROFILE_VIEW(
+              post?.user?.username || post?.user?._id || ""
+            )}
             className="font-semibold text-sm"
           >
             {post?.user?.name || "Unknown User"}
@@ -43,7 +50,7 @@ export const Post = ({ post, onRequireAuth }) => {
 
       {/* Image */}
       <div className="relative">
-        <Link to={`/post/${post?._id}`}>
+        <Link to={PAGES.POST_VIEW(post?._id)}>
           <img
             src={post?.image}
             alt="Post"
