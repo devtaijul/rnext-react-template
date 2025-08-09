@@ -5,10 +5,9 @@ import { useAuth } from "../hooks/useAuth";
 import axios from "axios";
 
 export const LoginForm = () => {
-  const { auth, setSession } = useAuth();
+  const { setSession } = useAuth();
   const navigate = useNavigate();
   const [showPw, setShowPw] = useState(false);
-  console.log("auth", auth);
 
   const {
     register,
@@ -21,8 +20,6 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values) => {
-    console.log("values", values);
-
     const variables = {
       email: values.identifier,
       password: values.password,
@@ -39,8 +36,6 @@ export const LoginForm = () => {
           },
         }
       );
-
-      console.log("res", res);
 
       if (res.status === 200) {
         const { accessToken, refreshToken, user } = res.data;

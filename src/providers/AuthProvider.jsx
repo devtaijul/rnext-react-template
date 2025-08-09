@@ -44,8 +44,6 @@ const AuthProvider = ({ children }) => {
       // 1) save refresh token locally (so reload e thake)
       localStorage.setItem("refreshToken", incomingRefreshToken);
 
-      console.log("Incoming refresh token ", incomingRefreshToken);
-
       // 2) exchange for fresh access token + user
       const res = await axios.post(`${BASE_URL}/api/auth/refresh-token`, {
         refreshToken: incomingRefreshToken,

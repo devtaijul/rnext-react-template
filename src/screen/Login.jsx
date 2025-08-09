@@ -1,6 +1,7 @@
 import React from "react";
 import logo from "../assets/logo.svg";
 import { LoginForm } from "../components/LoginForm";
+import { PAGES } from "../config/pages.config";
 
 export const Login = () => {
   return (
@@ -18,7 +19,7 @@ export const Login = () => {
         <div className="bg-white p-6 border border-gray-300 text-center ">
           <p className="text-sm">
             Don't have an account?{" "}
-            <a href="./register.html" className="text-blue-500 font-semibold">
+            <a href={PAGES.REGISTER} className="text-blue-500 font-semibold">
               Sign up
             </a>
           </p>
