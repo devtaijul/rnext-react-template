@@ -4,11 +4,10 @@ import { useAuth } from "../hooks/useAuth";
 import { useMe } from "../hooks/useMe";
 
 export const EditProfile = () => {
-  const { api } = useAuth();
-  const { me, loading, error, refetch } = useMe(); // ✅ fresh user
-  const fileRef = useRef(null);
+  const { api, auth } = useAuth();
+  const { user, loading, error, reload } = useMe(); // ✅ fresh user
 
-  console.log(me, "me");
+  const fileRef = useRef(null);
 
   // ---------- Profile Form ----------
   const {
@@ -21,21 +20,23 @@ export const EditProfile = () => {
     defaultValues: { website: "", bio: "", gender: "Prefer not to say" },
   });
 
-  const [avatarPreview, setAvatarPreview] = useState(
-    "/assets/users/user-1.png"
-  );
+  const [avatarPreview, setAvatarPreview] = useState("");
   const [profileMsg, setProfileMsg] = useState("");
 
   // hydrate form when `me` changes
   useEffect(() => {
-    if (!me) return;
+    console.log("me", user);
+    if (!user) return;
+
     resetProfile({
-      website: me.website || "",
-      bio: me.bio || "",
-      gender: me.gender || "Prefer not to say",
+      website: user.website || "",
+      bio: user.bio || "",
+      gender: user.gender || "Prefer not to say",
     });
-    setAvatarPreview(me.avatar || "/assets/users/user-1.png");
-  }, [me, resetProfile]);
+    setAvatarPreview(
+      `${import.meta.env.VITE_SERVER_BASE_URL}/${user.avatar}` || ""
+    );
+  }, [user, resetProfile, auth]);
 
   const onPickAvatar = () => fileRef.current?.click();
   const onAvatarChange = (e) => {
@@ -51,16 +52,16 @@ export const EditProfile = () => {
       if (fileRef.current?.files?.[0]) {
         const fd = new FormData();
         fd.append("avatar", fileRef.current.files[0]);
-        await api.post("/users/me/avatar", fd);
+        await api.patch("/api/users/me/avatar", fd);
       }
       // 2) profile fields আপডেট
-      await api.patch("/users/me", {
+      await api.patch("/api/users/me", {
         website: values.website?.trim(),
         bio: values.bio?.trim(),
         gender: values.gender,
       });
       setProfileMsg("Profile updated successfully.");
-      await refetch(); // ✅ UI refresh with fresh /users/me
+      await reload(); // ✅ UI refresh with fresh /users/me
     } catch (err) {
       setProfileMsg(
         err?.response?.data?.message ||
@@ -115,7 +116,7 @@ export const EditProfile = () => {
       return;
     }
     try {
-      await api.post("/auth/change-password", {
+      await api.patch("/api/users/me/password", {
         currentPassword: values.currentPassword,
         newPassword: values.newPassword,
       });
@@ -160,15 +161,17 @@ export const EditProfile = () => {
             <div className="w-16 h-16 rounded-full overflow-hidden mr-4">
               <img
                 src={avatarPreview}
-                alt={me?.name || "User"}
+                alt={auth?.user.name || "User"}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
               <h2 className="font-semibold text-base">
-                {me?.name || "Your Name"}
+                {auth?.user.name || "Your Name"}
               </h2>
-              <p className="text-gray-500">@{me?.username || "username"}</p>
+              <p className="text-gray-500">
+                @{auth?.user.username || "username"}
+              </p>
             </div>
             <button
               type="button"
