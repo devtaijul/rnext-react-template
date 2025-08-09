@@ -8,7 +8,7 @@ export default function AppLayout() {
   const showSideNav = !HIDDEN_ON.has(pathname);
 
   return (
-    <div className="min-h-screen flex bg-black text-white">
+    <div className="min-h-screen flex">
       {showSideNav && <Sidebar />}
       <main className="flex-1">
         <Outlet />

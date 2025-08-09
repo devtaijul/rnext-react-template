@@ -17,6 +17,7 @@ const initialAuth = {
   user: null,
   loading: false,
   error: "",
+  hydrated: false,
 };
 const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState(initialAuth);
@@ -76,15 +77,23 @@ const AuthProvider = ({ children }) => {
   // --- boot: try restore from localStorage ---
   useEffect(() => {
     const saved = localStorage.getItem("refreshToken");
-    console.log("saved", saved);
 
-    if (saved) {
-      // silent restore
-      loginWithRefreshToken(saved).catch(() => {
-        // refreshToken invalid
-        logout();
-      });
-    }
+    const restore = async () => {
+      try {
+        if (saved) {
+          // silent login with saved refresh token
+          await loginWithRefreshToken(saved);
+        }
+      } catch (e) {
+        console.log(e);
+
+        // ignore; will stay logged out
+      } finally {
+        setAuth((p) => ({ ...p, hydrated: true })); // 👈 mark ready
+      }
+    };
+
+    restore();
   }, []);
 
   // --- axios interceptor: attach Bearer + auto refresh on 401 ---
